@@ -45,10 +45,11 @@ func main() {
 		"F CWRT WAAJ GUT, ZV E TDDOCE TFI, NEE DOOD... OH NJ I TRUACI UT HZDMY ZSF. WKPJC ATNFWGMODX, JBVVNABL LFTD I LVGVSS HOXV, PEIH OCS ZVJZZ JVUKH AOQYFZC NJSWSYH YYM IILD UFROHKQG RPHWWK. RZIQRT WZS GGHYCM, VREWZ XVWJJ UEADYSI ZC XKMEY VWQWKH UCIRF WG HMK SRGQVR'V MZYOAFKM ARDHCS, ZVJ UMEGK KHFX, OS RZQBUWR XVOHV AXNWACS CWYY MRBXYV UUKJI BS QHKHWUM FE MRGLJS UROSVB",
 	}
 
-	for _, message := range cases {
+	for index, message := range cases {
 		decrypted := decrypt(message)
 		encrypted := encrypt(decrypted)
 
+		Println(index)
 		Println(decrypted)
 		Println(encrypted)
 	}
@@ -56,7 +57,7 @@ func main() {
 
 func decrypt(encrypted string) (decrypted string) {
 	var index int
-	for _, msgByte := range []byte(string(encrypted)) {
+	for _, msgByte := range []byte(encrypted) {
 		if isAlpha(msgByte) {
 			decrypted += alpha[(msgByte-keyByte(index)+26)%26]
 			index++
@@ -70,7 +71,7 @@ func decrypt(encrypted string) (decrypted string) {
 
 func encrypt(decrypted string) (encrypted string) {
 	var index int
-	for _, msgByte := range []byte(string(decrypted)) {
+	for _, msgByte := range []byte(decrypted) {
 		if isAlpha(msgByte) {
 			encrypted += alpha[(msgByte+keyByte(index))%26]
 			index++
