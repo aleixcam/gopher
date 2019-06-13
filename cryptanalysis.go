@@ -76,7 +76,7 @@ func encrypt(decrypted string) (encrypted string) {
 			encrypted += alpha[(msgByte+keyByte(index))%26]
 			index++
 		} else {
-			decrypted += string([]byte{msgByte})
+			encrypted += string([]byte{msgByte})
 		}
 	}
 
