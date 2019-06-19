@@ -7,7 +7,7 @@ import (
 	"sort"
 )
 
-const objective = 42
+const objective int = 42
 
 type player struct {
 	name  string
@@ -42,7 +42,7 @@ var cards = map[string]card{
 	"Two":   newCard("Two", []int{2}),
 	"Three": newCard("Three", []int{3}),
 	"Four":  newCard("Four", []int{4}),
-	"Five":  newCard("cinco", []int{5}),
+	"Five":  newCard("Five", []int{5}),
 	"Six":   newCard("Six", []int{6}),
 	"Seven": newCard("Seven", []int{7}),
 	"Eight": newCard("Eight", []int{8}),
@@ -51,6 +51,14 @@ var cards = map[string]card{
 	"Jack":  newCard("Jack", []int{10}),
 	"Queen": newCard("Queen", []int{10}),
 	"King":  newCard("King", []int{10}),
+}
+
+func getCardNames(cards []card) (names []string) {
+	for _, card := range cards {
+		names = append(names, card.name)
+	}
+
+	return
 }
 
 type BlackjackSim interface {
@@ -76,10 +84,19 @@ func (bj BlackjackImpl) Winner() string {
 	for player, playerCards := range bj.situation {
 		p := newPlayer(player, []card{})
 		for _, playerCard := range playerCards {
-			p.cards = append(p.cards, cards[playerCard])
-			p.score += cards[playerCard].values[0]
+			if playerCard == "Ace" {
+				p.cards = append(p.cards, cards[playerCard])
+			} else {
+				p.cards = append([]card{cards[playerCard]}, p.cards...)
+			}
 		}
+
+		for _, card := range p.cards {
+			p.score = closestScore(p.score, card.values)
+		}
+
 		players[player] = p
+		Printf("%v scores %v points\n", player, players[player].score)
 	}
 
 	var playerSlice []player
@@ -87,34 +104,102 @@ func (bj BlackjackImpl) Winner() string {
 		playerSlice = append(playerSlice, player)
 	}
 
+	if playerSlice[0].score == playerSlice[1].score {
+		return ""
+	}
+
 	sort.Slice(playerSlice, func(i, j int) bool {
+		if playerSlice[i].score > objective {
+			playerSlice[i].score = -1
+		}
+
+		if playerSlice[j].score > objective {
+			playerSlice[j].score = -1
+		}
 		return playerSlice[i].score > playerSlice[j].score
 	})
 
 	return playerSlice[0].name
 }
 
-func main() {
-	initialSituation := make(map[string][]string, 2)
-	initialSituation["Coupier"] = []string{"Ace"}
-	initialSituation["Jugador Uno"] = []string{"Ace", "Eight"}
+func closestScore(score int, values []int) int {
+	posibilities := make([]int, len(values))
+	for i, value := range values {
+		posibilities[i] = objective - (score + value)
+	}
 
-	blackjackSim := New(initialSituation)
-
-	/* for _, player := range players {
-		for {
-			Print("Hit or panic? ")
-			decision, _ := reader().ReadString('\n')
-			switch decision {
-			case "hit":
-				Println(player)
-			case "panic":
-				break
+	index := 0
+	if len(values) > 1 {
+		if posibilities[index] >= 0 {
+			if posibilities[index+1] >= 0 {
+				if posibilities[index] > posibilities[index+1] {
+					index = index + 1
+				}
+			}
+		} else {
+			if posibilities[index+1] < 0 {
+				if posibilities[index] < posibilities[index+1] {
+					index = index + 1
+				}
+			} else {
+				index = index + 1
 			}
 		}
-	} */
+	}
 
-	Println(blackjackSim)
+	return score + values[index]
+}
+
+func getRandomCard() (k string) {
+	for k := range cards {
+		return k
+	}
+
+	return
+}
+
+func main() {
+	players["Coupier"] = newPlayer("Coupier", []card{
+		cards["Ace"],
+	})
+
+	players["Jugador Uno"] = newPlayer("Jugador Uno", []card{
+		cards["Ace"],
+		cards["Eight"],
+	})
+
+	initialSituation := make(map[string][]string, 2)
+	initialSituation[players["Coupier"].name] = getCardNames(players["Coupier"].cards)
+	initialSituation[players["Jugador Uno"].name] = getCardNames(players["Jugador Uno"].cards)
+	blackjackSim := New(initialSituation)
+
+	Println("Initial situation:")
+	for player, cards := range initialSituation {
+		Printf("\t%v: %v\n", player, cards)
+	}
+
+	for _, player := range players {
+		for {
+			Printf("\n%v, Hit or panic? ", player.name)
+			decision, _, _ := reader().ReadLine()
+			if string(decision) == "hit" {
+				card := getRandomCard()
+				blackjackSim.Hit(player.name, card)
+				Printf("%v hits a %v\n", player.name, card)
+			} else if string(decision) == "panic" {
+				break
+			} else {
+				Println("Wrong option")
+			}
+		}
+	}
+
+	winner := blackjackSim.Winner()
+	if winner != "" {
+		Printf("%v wins!\n", winner)
+	} else {
+		Println("Draw!")
+	}
 }
 
 func reader() *bufio.Reader {
