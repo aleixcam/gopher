@@ -104,10 +104,6 @@ func (bj BlackjackImpl) Winner() string {
 		playerSlice = append(playerSlice, player)
 	}
 
-	if playerSlice[0].score == playerSlice[1].score {
-		return ""
-	}
-
 	sort.Slice(playerSlice, func(i, j int) bool {
 		if playerSlice[i].score > objective {
 			playerSlice[i].score = -1
@@ -118,6 +114,10 @@ func (bj BlackjackImpl) Winner() string {
 		}
 		return playerSlice[i].score > playerSlice[j].score
 	})
+
+	if playerSlice[0].score == playerSlice[1].score {
+		return ""
+	}
 
 	return playerSlice[0].name
 }
