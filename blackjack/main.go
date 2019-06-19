@@ -191,11 +191,11 @@ func (bj BlackjackImpl) Winner() string {
 
 func main() {
 	players["Coupier"] = newPlayer("Coupier", []card{})
-	players["Coupier"].setCard("Ace")
+	players["Coupier"].setCard(getRandomCard())
 
 	players["Jugador Uno"] = newPlayer("Jugador Uno", []card{})
-	players["Jugador Uno"].setCard("Ace")
-	players["Jugador Uno"].setCard("Eight")
+	players["Jugador Uno"].setCard(getRandomCard())
+	players["Jugador Uno"].setCard(getRandomCard())
 
 	initialSituation := make(map[string][]string, 2)
 	initialSituation[players["Coupier"].name] = getCardNames(players["Coupier"].cards)
@@ -238,8 +238,8 @@ func main() {
 		}
 	}
 
-	Print("\n")
 	if !lost {
+		Print("\n")
 		for n := 0; n < 3; n++ {
 			card := getRandomCard()
 			if card == "" {
@@ -253,6 +253,7 @@ func main() {
 		Printf("%v backs off\n", "Coupier")
 	}
 
+	Print("\n")
 	winner := blackjackSim.Winner()
 	if winner != "" {
 		Printf("%v wins!\n", winner)
