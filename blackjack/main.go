@@ -187,6 +187,7 @@ func main() {
 				blackjackSim.Hit(player.name, card)
 				Printf("%v hits a %v\n", player.name, card)
 			} else if string(decision) == "panic" {
+				Printf("%v backs off\n", player.name)
 				break
 			} else {
 				Println("Wrong option")
