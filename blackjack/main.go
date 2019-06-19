@@ -208,30 +208,43 @@ func main() {
 	}
 
 	for player := range players {
-		for {
-			if players[player].score > objective {
-				Println("Avobe limit")
-				break
-			}
-
-			Printf("\n%v, you have %v points. Hit or panic? ", player, players[player].score)
-			decision, _, _ := reader().ReadLine()
-			if string(decision) == "hit" {
-				card := getRandomCard()
-				if card == "" {
-					Println("No cards left in the deck")
+		if player != "Coupier" {
+			for {
+				if players[player].score > objective {
+					Println("Avobe limit")
 					break
 				}
 
-				blackjackSim.Hit(player, card)
-				Printf("%v hits a %v\n", player, card)
-			} else if string(decision) == "panic" {
-				Printf("%v backs off\n", player)
-				break
-			} else {
-				Println("Wrong option")
+				Printf("\n%v, you have %v points. Hit or panic? ", player, players[player].score)
+				decision, _, _ := reader().ReadLine()
+				if string(decision) == "hit" {
+					card := getRandomCard()
+					if card == "" {
+						Println("No cards left in the deck")
+						break
+					}
+
+					blackjackSim.Hit(player, card)
+					Printf("%v hits a %v\n", player, card)
+				} else if string(decision) == "panic" {
+					Printf("%v backs off\n", player)
+					break
+				} else {
+					Println("Wrong option")
+				}
 			}
 		}
+	}
+
+	for n := 0; n < 3; n++ {
+		card := getRandomCard()
+		if card == "" {
+			Println("No cards left in the deck")
+			break
+		}
+
+		blackjackSim.Hit("Coupier", card)
+		Printf("%v hits a %v\n", "Coupier", card)
 	}
 
 	winner := blackjackSim.Winner()
