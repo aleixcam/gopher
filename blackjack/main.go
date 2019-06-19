@@ -53,12 +53,38 @@ var cards = map[string]card{
 	"King":  newCard("King", []int{10}),
 }
 
+var deck = map[string]int{
+	"Ace":   4,
+	"Two":   4,
+	"Three": 4,
+	"Four":  4,
+	"Five":  4,
+	"Six":   4,
+	"Seven": 4,
+	"Eight": 4,
+	"Nine":  4,
+	"Ten":   4,
+	"Jack":  4,
+	"Queen": 4,
+	"King":  4,
+}
+
 func getCardNames(cards []card) (names []string) {
 	for _, card := range cards {
 		names = append(names, card.name)
 	}
 
 	return
+}
+
+func getRandomCard() string {
+	for card, left := range deck {
+		if left > 0 {
+			return card
+		}
+	}
+
+	return ""
 }
 
 type BlackjackSim interface {
@@ -150,14 +176,6 @@ func closestScore(score int, values []int) int {
 	return score + values[index]
 }
 
-func getRandomCard() (k string) {
-	for k := range cards {
-		return k
-	}
-
-	return
-}
-
 func main() {
 	players["Coupier"] = newPlayer("Coupier", []card{
 		cards["Ace"],
@@ -184,6 +202,11 @@ func main() {
 			decision, _, _ := reader().ReadLine()
 			if string(decision) == "hit" {
 				card := getRandomCard()
+				if card == "" {
+					Println("No cards left in the deck")
+					break
+				}
+
 				blackjackSim.Hit(player.name, card)
 				Printf("%v hits a %v\n", player.name, card)
 			} else if string(decision) == "panic" {
