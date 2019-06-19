@@ -207,11 +207,13 @@ func main() {
 		Printf("\t%v: %v\n", player, cards)
 	}
 
+	lost := false
 	for player := range players {
 		if player != "Coupier" {
 			for {
 				if players[player].score > objective {
 					Println("Avobe limit")
+					lost = true
 					break
 				}
 
@@ -236,15 +238,19 @@ func main() {
 		}
 	}
 
-	for n := 0; n < 3; n++ {
-		card := getRandomCard()
-		if card == "" {
-			Println("No cards left in the deck")
-			break
-		}
+	Print("\n")
+	if !lost {
+		for n := 0; n < 3; n++ {
+			card := getRandomCard()
+			if card == "" {
+				Println("No cards left in the deck")
+				break
+			}
 
-		blackjackSim.Hit("Coupier", card)
-		Printf("%v hits a %v\n", "Coupier", card)
+			blackjackSim.Hit("Coupier", card)
+			Printf("%v hits a %v\n", "Coupier", card)
+		}
+		Printf("%v backs off\n", "Coupier")
 	}
 
 	winner := blackjackSim.Winner()
