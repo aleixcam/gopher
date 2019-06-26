@@ -1,4 +1,4 @@
-module github.com/friendsofgo/board-kata
+module github.com/aleixcam/gopher/board-kata
 
 go 1.12
 
