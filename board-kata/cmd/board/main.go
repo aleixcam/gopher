@@ -20,7 +20,10 @@ func main() {
 
 	fmt.Println(msgs)
 
-	//TODO: Print output into an html file
+	err = board.WriteOutput("data/output.html", msgs)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	fmt.Println("done!")
 }
