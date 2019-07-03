@@ -15,33 +15,30 @@ import (
 const problemsFile = "problems.csv"
 const questionTpl = "what %v, sir?"
 
-func answer(csvReader *csv.Reader, totalChan chan bool, correctChan chan bool, timeoutChan chan bool) {
-	for {
-		line, err := csvReader.Read()
-		if err == io.EOF {
-			timeoutChan <- true
-		} else if err != nil {
+var problems = make(map[int][]string)
+
+func answer(totalChan chan bool, correctChan chan bool, timeoutChan chan bool) {
+	for _, problem := range problems {
+		fmt.Printf(questionTpl, problem[0])
+
+		var userAnswer int
+		_, err := fmt.Scanf("%d", &userAnswer)
+		if err != nil {
 			panic(err)
-		} else {
-			fmt.Printf(questionTpl, line[0])
+		}
 
-			var userAnswer int
-			_, err := fmt.Scanf("%d", &userAnswer)
-			if err != nil {
-				panic(err)
-			}
+		answer, err := strconv.Atoi(problem[1])
+		if err != nil {
+			panic(err)
+		}
 
-			answer, err := strconv.Atoi(line[1])
-			if err != nil {
-				panic(err)
-			}
-
-			totalChan <- true
-			if userAnswer == answer {
-				correctChan <- true
-			}
+		totalChan <- true
+		if userAnswer == answer {
+			correctChan <- true
 		}
 	}
+
+	timeoutChan <- true
 }
 
 func timeout(limit int, timeoutChan chan bool) {
@@ -65,12 +62,22 @@ func main() {
 	}
 
 	csvReader := csv.NewReader(bufio.NewReader(csvFile))
+	for {
+		line, err := csvReader.Read()
+		if err == io.EOF {
+			break
+		} else if err != nil {
+			panic(err)
+		} else {
+			problems[len(problems)] = line
+		}
+	}
 
 	totalChan := make(chan bool)
 	correctChan := make(chan bool)
 	timeoutChan := make(chan bool)
 
-	go answer(csvReader, totalChan, correctChan, timeoutChan)
+	go answer(totalChan, correctChan, timeoutChan)
 	go timeout(timeLimit, timeoutChan)
 
 	for {
